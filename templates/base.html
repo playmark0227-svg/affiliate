@@ -6,6 +6,8 @@
 <title>{% block title %}{{ site.title }}{% endblock %}</title>
 <meta name="description" content="{% block description %}{{ site.description }}{% endblock %}">
 <meta name="robots" content="index, follow, max-image-preview:large">
+{% if site.google_verify %}<meta name="google-site-verification" content="{{ site.google_verify }}">{% endif %}
+{% if site.bing_verify %}<meta name="msvalidate.01" content="{{ site.bing_verify }}">{% endif %}
 <link rel="canonical" href="{% block canonical %}{{ site.base_url }}/{% endblock %}">
 
 <meta property="og:site_name" content="{{ site.title }}">
@@ -21,6 +23,15 @@
 
 <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ site.base_url }}/feed.xml">
 <link rel="stylesheet" href="{{ site.base_url }}/static/style.css">
+{% if site.ga_id %}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ site.ga_id }}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '{{ site.ga_id }}');
+</script>
+{% endif %}
 {% block head %}{% endblock %}
 </head>
 <body>

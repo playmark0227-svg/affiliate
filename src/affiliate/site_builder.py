@@ -111,6 +111,9 @@ def build(cfg: Config) -> None:
         "description": cfg.site_description,
         "base_url": cfg.site_base_url,
         "year": dt.date.today().year,
+        "ga_id": cfg.ga_id,
+        "google_verify": cfg.google_site_verification,
+        "bing_verify": cfg.bing_site_verification,
     }
 
     index_tpl = env.get_template("index.html")
@@ -132,6 +135,7 @@ def build(cfg: Config) -> None:
     _write_sitemap(posts, cfg)
     _write_rss(posts, cfg)
     _write_robots(cfg)
+    _write_cname(cfg)
 
     (SITE_DIR / ".nojekyll").write_text("")
 
@@ -202,6 +206,21 @@ def _write_robots(cfg: Config) -> None:
         f"Sitemap: {cfg.site_base_url}/sitemap.xml\n"
     )
     (SITE_DIR / "robots.txt").write_text(content, encoding="utf-8")
+
+
+def _write_cname(cfg: Config) -> None:
+    """Emit a CNAME file when a custom domain is configured.
+
+    GitHub Pages reads this file and routes the apex/subdomain to the site.
+    """
+    domain = (cfg.site_custom_domain or "").strip()
+    if not domain:
+        return
+    # Strip scheme / trailing slash if the user accidentally entered a URL.
+    domain = domain.replace("https://", "").replace("http://", "").rstrip("/")
+    if not domain:
+        return
+    (SITE_DIR / "CNAME").write_text(domain + "\n", encoding="utf-8")
 
 
 def ping_sitemap(cfg: Config) -> None:

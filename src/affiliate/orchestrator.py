@@ -63,10 +63,12 @@ def run_once() -> int:
     site_builder.build(cfg)
     print("[orchestrator] site built")
 
-    # 5. Optional: announce on X
+    # 5. Optional: announce on X / Discord
     for article, url in new_paths:
         if social.maybe_post_to_x(cfg, article, url):
             print(f"[orchestrator] posted to X: {url}")
+        if social.maybe_notify_discord(cfg, article, url):
+            print(f"[orchestrator] notified Discord: {url}")
 
     # 6. Ping search engines so the new posts get indexed faster
     if new_paths:

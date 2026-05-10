@@ -31,6 +31,13 @@ class Config:
     site_base_url: str
     site_title: str
     site_description: str
+    site_custom_domain: str
+
+    ga_id: str
+    google_site_verification: str
+    bing_site_verification: str
+
+    discord_webhook_url: str
 
     articles_per_run: int
     model: str
@@ -51,6 +58,11 @@ class Config:
             site_base_url=os.environ.get("SITE_BASE_URL", "https://example.github.io/affiliate").rstrip("/"),
             site_title=os.environ.get("SITE_TITLE", "AI Review Lab"),
             site_description=os.environ.get("SITE_DESCRIPTION", "AI-curated product reviews"),
+            site_custom_domain=os.environ.get("SITE_CUSTOM_DOMAIN", "").strip(),
+            ga_id=os.environ.get("GA_MEASUREMENT_ID", "").strip(),
+            google_site_verification=os.environ.get("GOOGLE_SITE_VERIFICATION", "").strip(),
+            bing_site_verification=os.environ.get("BING_SITE_VERIFICATION", "").strip(),
+            discord_webhook_url=os.environ.get("DISCORD_WEBHOOK_URL", "").strip(),
             articles_per_run=int(os.environ.get("ARTICLES_PER_RUN", "2")),
             model=os.environ.get("MODEL", "claude-opus-4-7"),
         )
