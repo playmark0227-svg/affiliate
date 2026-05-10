@@ -1,0 +1,26 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+env/
+.env
+.env.local
+*.log
+
+# Generated site (we'll commit only sources and let CI build)
+site/
+.cache/
+
+# Local data that should still be committed for state persistence:
+# data/state.json - DO COMMIT (so cron has memory)
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp

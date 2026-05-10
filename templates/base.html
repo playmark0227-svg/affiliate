@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}{{ site.title }}{% endblock %}</title>
+<meta name="description" content="{% block description %}{{ site.description }}{% endblock %}">
+<link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ site.base_url }}/feed.xml">
+<link rel="stylesheet" href="{{ site.base_url }}/static/style.css">
+{% block head %}{% endblock %}
+</head>
+<body>
+<header class="site-header">
+  <div class="container">
+    <a href="{{ site.base_url }}/" class="site-title">{{ site.title }}</a>
+    <p class="site-tagline">{{ site.description }}</p>
+  </div>
+</header>
+<main class="container">
+{% block content %}{% endblock %}
+</main>
+<footer class="site-footer">
+  <div class="container">
+    <p>&copy; {{ site.year }} {{ site.title }}</p>
+    <p class="disclosure">本サイトはアフィリエイトプログラムにより収益を得ています。</p>
+  </div>
+</footer>
+</body>
+</html>

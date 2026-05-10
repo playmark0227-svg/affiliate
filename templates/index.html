@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>{{ site.title }}</h1>
+  <p>{{ site.description }}</p>
+</section>
+
+<section class="post-list">
+  {% if posts|length == 0 %}
+  <p>記事はまだありません。</p>
+  {% endif %}
+  {% for post in posts %}
+  <article class="post-card">
+    <h2><a href="{{ site.base_url }}/{{ post.url_path }}">{{ post.title }}</a></h2>
+    <p class="meta">
+      <time>{{ post.date }}</time>
+      {% if post.category %} · <span class="cat">{{ post.category }}</span>{% endif %}
+    </p>
+    <p class="excerpt">{{ post.excerpt }}</p>
+    <p><a class="readmore" href="{{ site.base_url }}/{{ post.url_path }}">続きを読む →</a></p>
+  </article>
+  {% endfor %}
+</section>
+{% endblock %}

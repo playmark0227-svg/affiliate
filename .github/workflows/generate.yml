@@ -1,0 +1,70 @@
+name: Auto-generate posts
+
+on:
+  schedule:
+    # Runs daily at 06:00 UTC = 15:00 JST
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      articles:
+        description: "Number of articles to generate"
+        required: false
+        default: "2"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate articles
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AMAZON_ASSOCIATE_TAG: ${{ secrets.AMAZON_ASSOCIATE_TAG }}
+          RAKUTEN_AFFILIATE_ID: ${{ secrets.RAKUTEN_AFFILIATE_ID }}
+          A8_LINK_TEMPLATE: ${{ secrets.A8_LINK_TEMPLATE }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+          SITE_BASE_URL: ${{ vars.SITE_BASE_URL }}
+          SITE_TITLE: ${{ vars.SITE_TITLE }}
+          SITE_DESCRIPTION: ${{ vars.SITE_DESCRIPTION }}
+          ARTICLES_PER_RUN: ${{ github.event.inputs.articles || vars.ARTICLES_PER_RUN || '2' }}
+          MODEL: ${{ vars.MODEL || 'claude-opus-4-7' }}
+          PYTHONPATH: src
+        run: python -m affiliate.cli run
+
+      - name: Commit new content
+        run: |
+          git config user.name "affiliate-bot"
+          git config user.email "affiliate-bot@users.noreply.github.com"
+          git add content/ data/
+          if git diff --cached --quiet; then
+            echo "No new content"
+            exit 0
+          fi
+          git commit -m "auto: generate new articles ($(date -u +%Y-%m-%d))"
+          for i in 1 2 3 4; do
+            git push && break
+            sleep $((2 ** i))
+          done
