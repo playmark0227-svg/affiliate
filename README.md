@@ -83,7 +83,24 @@ AIが自律的に商品レビュー記事を生成→静的ブログとして公
 - その後 `Auto-generate posts` も手動実行できる
 - 毎日 06:00 UTC (日本時間 15:00) に勝手に新記事が増え続ける
 
+> **重要:** `Deploy site` は **`ANTHROPIC_API_KEY` 無しでも動きます**(seed記事8本だけでサイトが立ち上がる)。
+> なので「とりあえず公開だけ確認したい」なら、まず GitHub Pages 有効化 → `Deploy site` 実行で公開URLが出ます。
+> APIキーやアフィリエイトIDは後から Secrets に追加すれば、翌日の cron から自動生成が走り始めます。
+
 これで設定完了です。
+
+### 6. (任意)アクセス解析・検索コンソール
+
+設定すれば自動でメタタグが入ります。すべて GitHub の **Variables** に追加するだけ。
+
+| キー | 用途 | 取得元 |
+|------|------|--------|
+| `GA_MEASUREMENT_ID` | Google Analytics 4 | https://analytics.google.com で プロパティ作成 → 測定ID `G-XXXXXXXXXX` |
+| `GOOGLE_SITE_VERIFICATION` | Search Console | https://search.google.com/search-console → 「HTMLタグ」で `content="..."` の中身 |
+| `BING_SITE_VERIFICATION` | Bing Webmaster | https://www.bing.com/webmasters → メタタグ方式の `content="..."` |
+| `SITE_CUSTOM_DOMAIN` | 独自ドメイン | 例: `example.com` または `blog.example.com`(設定時は `site/CNAME` 自動生成) |
+
+Discord通知が欲しい場合は、Discord チャンネルの「連携サービス → Webhook」で URL を取得し、**Secrets** に `DISCORD_WEBHOOK_URL` として保存。
 
 ---
 

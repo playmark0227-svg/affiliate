@@ -85,6 +85,31 @@ def main() -> int:
     else:
         _warn("X auto-posting disabled (set 4 X_* env vars to enable)")
 
+    if cfg.discord_webhook_url:
+        _ok("Discord webhook set (new posts will be announced)")
+    else:
+        _warn("Discord webhook not set (optional)")
+
+    print("\n=== Analytics & Search Console ===")
+    if cfg.ga_id:
+        _ok(f"Google Analytics 4 ID = {cfg.ga_id}")
+    else:
+        _warn("GA_MEASUREMENT_ID not set (no analytics tag will be emitted)")
+    if cfg.google_site_verification:
+        _ok("Google Search Console verification meta set")
+    else:
+        _warn("GOOGLE_SITE_VERIFICATION not set (you can verify via DNS instead)")
+    if cfg.bing_site_verification:
+        _ok("Bing Webmaster verification meta set")
+    else:
+        _warn("BING_SITE_VERIFICATION not set (optional)")
+
+    print("\n=== Custom domain ===")
+    if cfg.site_custom_domain:
+        _ok(f"SITE_CUSTOM_DOMAIN = {cfg.site_custom_domain} (CNAME will be emitted)")
+    else:
+        _warn("SITE_CUSTOM_DOMAIN not set (using default github.io URL)")
+
     print("\n=== Tuning ===")
     _ok(f"ARTICLES_PER_RUN = {cfg.articles_per_run}")
     _ok(f"MODEL = {cfg.model}")

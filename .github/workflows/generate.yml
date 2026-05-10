@@ -48,9 +48,14 @@ jobs:
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           SITE_BASE_URL: ${{ vars.SITE_BASE_URL }}
           SITE_TITLE: ${{ vars.SITE_TITLE }}
           SITE_DESCRIPTION: ${{ vars.SITE_DESCRIPTION }}
+          SITE_CUSTOM_DOMAIN: ${{ vars.SITE_CUSTOM_DOMAIN }}
+          GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
+          GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
+          BING_SITE_VERIFICATION: ${{ vars.BING_SITE_VERIFICATION }}
           ARTICLES_PER_RUN: ${{ github.event.inputs.articles || vars.ARTICLES_PER_RUN || '2' }}
           MODEL: ${{ vars.MODEL || 'claude-opus-4-7' }}
           PYTHONPATH: src

@@ -41,6 +41,10 @@ jobs:
           SITE_BASE_URL: ${{ vars.SITE_BASE_URL }}
           SITE_TITLE: ${{ vars.SITE_TITLE }}
           SITE_DESCRIPTION: ${{ vars.SITE_DESCRIPTION }}
+          SITE_CUSTOM_DOMAIN: ${{ vars.SITE_CUSTOM_DOMAIN }}
+          GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
+          GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
+          BING_SITE_VERIFICATION: ${{ vars.BING_SITE_VERIFICATION }}
           PYTHONPATH: src
         run: python -m affiliate.cli build
 
