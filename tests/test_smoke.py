@@ -57,7 +57,7 @@ class SmokeTests(unittest.TestCase):
 
     def test_publish_and_build(self):
         article = {
-            "title": "テスト記事",
+            "title": "テスト記事_DO_NOT_KEEP",
             "description": "テスト説明",
             "tags": ["test"],
             "category": "ガジェット",
@@ -75,10 +75,13 @@ class SmokeTests(unittest.TestCase):
         self.assertTrue((SITE_DIR / "index.html").exists())
         self.assertTrue((SITE_DIR / "feed.xml").exists())
         self.assertTrue((SITE_DIR / "sitemap.xml").exists())
+        self.assertTrue((SITE_DIR / "about.html").exists())
+        self.assertTrue((SITE_DIR / "privacy.html").exists())
+        self.assertTrue((SITE_DIR / "robots.txt").exists())
 
-        # Cleanup so re-runs are deterministic
-        for f in CONTENT_DIR.glob("*.md"):
-            f.unlink()
+        # Only delete the file this test created. Don't nuke seed content.
+        if path.exists():
+            path.unlink()
 
     def test_state_roundtrip(self):
         s = state.load()

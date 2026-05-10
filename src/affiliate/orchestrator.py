@@ -19,6 +19,8 @@ def run_once() -> int:
         amazon_tag=cfg.amazon_tag,
         rakuten_id=cfg.rakuten_id,
         a8_template=cfg.a8_template,
+        moshimo_id=cfg.moshimo_id,
+        valuecommerce_template=cfg.valuecommerce_template,
     )
 
     s = state.load()
@@ -65,6 +67,10 @@ def run_once() -> int:
     for article, url in new_paths:
         if social.maybe_post_to_x(cfg, article, url):
             print(f"[orchestrator] posted to X: {url}")
+
+    # 6. Ping search engines so the new posts get indexed faster
+    if new_paths:
+        site_builder.ping_sitemap(cfg)
 
     return len(new_paths)
 

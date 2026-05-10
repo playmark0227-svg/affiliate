@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ page.title }} - {{ site.title }}{% endblock %}
+{% block description %}{{ page.title }} | {{ site.title }}{% endblock %}
+{% block canonical %}{{ site.base_url }}/{{ page.title }}{% endblock %}
+{% block content %}
+<article class="post page">
+  <header>
+    <h1>{{ page.title }}</h1>
+  </header>
+  <div class="post-body">
+    {{ page.body|safe }}
+  </div>
+</article>
+{% endblock %}

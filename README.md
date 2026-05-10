@@ -38,9 +38,13 @@ AIが自律的に商品レビュー記事を生成→静的ブログとして公
 
 | プログラム | 登録URL | 必要な値 |
 |-----------|---------|---------|
+| もしもアフィリエイト ⭐推奨 | https://af.moshimo.com | a_id(管理画面の「ID確認」)|
 | Amazonアソシエイト | https://affiliate.amazon.co.jp | アソシエイトタグ(例: `yourname-22`) |
 | 楽天アフィリエイト | https://affiliate.rakuten.co.jp | アフィリエイトID |
 | A8.net (任意) | https://www.a8.net | 任意の案件のアフィリエイトリンク |
+| バリューコマース (任意) | https://www.valuecommerce.ne.jp | 案件別のリンクテンプレート |
+
+> **おすすめ:** もしもアフィリエイトが最も審査が緩く、1アカウントで Amazon/楽天/Yahoo!ショッピングの3大ECに対応できます。Amazonアソシエイト本家の審査は厳しい(180日以内に3件売上が必要)ので、もしも経由のAmazonリンクから始めるのが現実的です。
 
 ### 3. GitHub の Secrets / Variables を設定
 
@@ -51,9 +55,11 @@ AIが自律的に商品レビュー記事を生成→静的ブログとして公
 | キー | 必須 | 説明 |
 |------|------|------|
 | `ANTHROPIC_API_KEY` | ✅ | https://console.anthropic.com で取得 |
-| `AMAZON_ASSOCIATE_TAG` | 推奨 | Amazon アソシエイトタグ |
+| `MOSHIMO_ID` | 推奨 | もしもアフィリエイトのa_id |
+| `AMAZON_ASSOCIATE_TAG` | 任意 | Amazon アソシエイトタグ(本家) |
 | `RAKUTEN_AFFILIATE_ID` | 任意 | 楽天アフィリエイトID |
 | `A8_LINK_TEMPLATE` | 任意 | A8.netのアフィリンクURL |
+| `VALUECOMMERCE_LINK_TEMPLATE` | 任意 | バリューコマースのリンク |
 | `X_API_KEY` 他 | 任意 | XへのAuto投稿用 (4つ) |
 
 #### Variables(平文)
@@ -72,11 +78,27 @@ AIが自律的に商品レビュー記事を生成→静的ブログとして公
 
 ### 5. 動作確認
 
-- **Actions** タブから `Auto-generate posts` ワークフローを **Run workflow** で手動実行
-- 数分後に `content/posts/` に新しい記事が commit される
-- `Deploy site` ワークフローが自動でトリガーされ、 GitHub Pages に反映される
+- **Actions** タブから `Deploy site` ワークフローを **Run workflow** で手動実行
+- 数分後に GitHub Pages にサイトが公開される(**初期記事8本がすでに用意されています**)
+- その後 `Auto-generate posts` も手動実行できる
+- 毎日 06:00 UTC (日本時間 15:00) に勝手に新記事が増え続ける
 
-これで設定完了。あとは毎日 06:00 UTC (日本時間 15:00) に勝手に新記事が増え続けます。
+これで設定完了です。
+
+---
+
+## 含まれているもの
+
+- ✅ **初期記事8本**(私が書いた、APIコール不要のコンテンツ)— ガジェット/在宅ワーク/キッチン/美容健康/学習/アウトドア
+- ✅ **About/プライバシーポリシー/お問い合わせ**ページ自動生成
+- ✅ **JSON-LD構造化データ**(Article / FAQ / BreadcrumbList)
+- ✅ **OGP / Twitter Card メタタグ**
+- ✅ **canonical / robots.txt / sitemap.xml / RSS feed**
+- ✅ **Google・Bingへのサイトマップ自動ping**(新記事公開時)
+- ✅ **記事間の関連記事自動リンク**(同カテゴリ優先)
+- ✅ **Amazon・楽天・Yahoo(もしも経由)・A8・バリューコマース**の5ASP対応
+- ✅ **GitHub Actions cron**で毎日自動投稿
+- ✅ **`python -m affiliate.cli check`** で設定漏れを検出
 
 ---
 
@@ -94,11 +116,17 @@ cp .env.example .env
 export $(cat .env | xargs)
 export PYTHONPATH=src
 
+# セットアップを検証
+python -m affiliate.cli check
+
 # 1回だけ実行(記事1〜2本生成)
 python -m affiliate.cli run
 
 # サイトのHTMLをビルドのみ
 python -m affiliate.cli build
+
+# 検索エンジンにサイトマップを通知
+python -m affiliate.cli ping
 
 # テスト
 python -m unittest tests.test_smoke -v

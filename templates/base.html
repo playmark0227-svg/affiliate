@@ -5,6 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% block title %}{{ site.title }}{% endblock %}</title>
 <meta name="description" content="{% block description %}{{ site.description }}{% endblock %}">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="{% block canonical %}{{ site.base_url }}/{% endblock %}">
+
+<meta property="og:site_name" content="{{ site.title }}">
+<meta property="og:type" content="{% block og_type %}website{% endblock %}">
+<meta property="og:title" content="{% block og_title %}{{ site.title }}{% endblock %}">
+<meta property="og:description" content="{% block og_description %}{{ site.description }}{% endblock %}">
+<meta property="og:url" content="{% block og_url %}{{ site.base_url }}/{% endblock %}">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{% block twitter_title %}{{ site.title }}{% endblock %}">
+<meta name="twitter:description" content="{% block twitter_description %}{{ site.description }}{% endblock %}">
+
 <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ site.base_url }}/feed.xml">
 <link rel="stylesheet" href="{{ site.base_url }}/static/style.css">
 {% block head %}{% endblock %}
@@ -14,6 +28,12 @@
   <div class="container">
     <a href="{{ site.base_url }}/" class="site-title">{{ site.title }}</a>
     <p class="site-tagline">{{ site.description }}</p>
+    <nav class="site-nav">
+      <a href="{{ site.base_url }}/">ホーム</a>
+      <a href="{{ site.base_url }}/about.html">運営者</a>
+      <a href="{{ site.base_url }}/privacy.html">プライバシー</a>
+      <a href="{{ site.base_url }}/contact.html">お問い合わせ</a>
+    </nav>
   </div>
 </header>
 <main class="container">
@@ -22,7 +42,12 @@
 <footer class="site-footer">
   <div class="container">
     <p>&copy; {{ site.year }} {{ site.title }}</p>
-    <p class="disclosure">本サイトはアフィリエイトプログラムにより収益を得ています。</p>
+    <p class="disclosure">本サイトはアフィリエイトプログラムにより収益を得ています。Amazon.co.jp および 楽天市場のアソシエイトとして、適格な購入から収入を得ています。</p>
+    <p class="footer-links">
+      <a href="{{ site.base_url }}/about.html">運営者情報</a> ·
+      <a href="{{ site.base_url }}/privacy.html">プライバシーポリシー</a> ·
+      <a href="{{ site.base_url }}/contact.html">お問い合わせ</a>
+    </p>
   </div>
 </footer>
 </body>

@@ -1,18 +1,75 @@
 {% extends "base.html" %}
 {% block title %}{{ post.title }} - {{ site.title }}{% endblock %}
 {% block description %}{{ post.description or post.excerpt }}{% endblock %}
+{% block canonical %}{{ site.base_url }}/{{ post.url_path }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ post.title }}{% endblock %}
+{% block og_description %}{{ post.description or post.excerpt }}{% endblock %}
+{% block og_url %}{{ site.base_url }}/{{ post.url_path }}{% endblock %}
+{% block twitter_title %}{{ post.title }}{% endblock %}
+{% block twitter_description %}{{ post.description or post.excerpt }}{% endblock %}
+{% block head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ post.title|tojson }},
+  "description": {{ (post.description or post.excerpt)|tojson }},
+  "datePublished": {{ post.date|tojson }},
+  "author": {
+    "@type": "Organization",
+    "name": {{ site.title|tojson }}
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": {{ site.title|tojson }}
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ site.base_url }}/{{ post.url_path }}"
+  }
+}
+</script>
+{% if post.faq_jsonld %}
+<script type="application/ld+json">
+{{ post.faq_jsonld|safe }}
+</script>
+{% endif %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "ホーム", "item": "{{ site.base_url }}/"},
+    {"@type": "ListItem", "position": 2, "name": {{ post.title|tojson }}, "item": "{{ site.base_url }}/{{ post.url_path }}"}
+  ]
+}
+</script>
+{% endblock %}
 {% block content %}
 <article class="post">
   <header>
     <h1>{{ post.title }}</h1>
     <p class="meta">
-      <time>{{ post.date }}</time>
+      <time datetime="{{ post.date }}">{{ post.date }}</time>
       {% if post.category %} · <span class="cat">{{ post.category }}</span>{% endif %}
     </p>
   </header>
   <div class="post-body">
     {{ post.body_html|safe }}
   </div>
+
+  {% if post.related %}
+  <aside class="related">
+    <h2>関連記事</h2>
+    <ul>
+      {% for r in post.related %}
+      <li><a href="{{ site.base_url }}/{{ r.url_path }}">{{ r.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </aside>
+  {% endif %}
+
   <p class="back"><a href="{{ site.base_url }}/">← 一覧に戻る</a></p>
 </article>
 {% endblock %}

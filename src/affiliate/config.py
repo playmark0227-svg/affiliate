@@ -20,6 +20,8 @@ class Config:
     amazon_tag: str
     rakuten_id: str
     a8_template: str
+    moshimo_id: str
+    valuecommerce_template: str
 
     x_api_key: str
     x_api_secret: str
@@ -40,6 +42,8 @@ class Config:
             amazon_tag=os.environ.get("AMAZON_ASSOCIATE_TAG", ""),
             rakuten_id=os.environ.get("RAKUTEN_AFFILIATE_ID", ""),
             a8_template=os.environ.get("A8_LINK_TEMPLATE", ""),
+            moshimo_id=os.environ.get("MOSHIMO_ID", ""),
+            valuecommerce_template=os.environ.get("VALUECOMMERCE_LINK_TEMPLATE", ""),
             x_api_key=os.environ.get("X_API_KEY", ""),
             x_api_secret=os.environ.get("X_API_SECRET", ""),
             x_access_token=os.environ.get("X_ACCESS_TOKEN", ""),
