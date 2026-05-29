@@ -70,7 +70,8 @@ AIが自律的に商品レビュー記事を生成→静的ブログとして公
 | `SITE_TITLE` | サイト名 | `お得レビューラボ` |
 | `SITE_DESCRIPTION` | サブタイトル | `AIが選ぶ商品レビュー` |
 | `ARTICLES_PER_RUN` | 1日あたりの生成数 | `2` |
-| `MODEL` | 使用モデル | `claude-opus-4-7` |
+| `MODEL` | 使用モデル | `claude-opus-4-8` |
+| `EFFORT` | 思考の深さ(low/medium/high/xhigh/max) | `high` |
 
 ### 4. GitHub Pages を有効化
 
@@ -116,6 +117,21 @@ Discord通知が欲しい場合は、Discord チャンネルの「連携サー�
 - ✅ **Amazon・楽天・Yahoo(もしも経由)・A8・バリューコマース**の5ASP対応
 - ✅ **GitHub Actions cron**で毎日自動投稿
 - ✅ **`python -m affiliate.cli check`** で設定漏れを検出
+
+---
+
+## AI生成エンジン(Claude Opus 4.8 最適化)
+
+記事生成・テーマ選定は最新の **Claude Opus 4.8** を使い、以下を有効化しています(`src/affiliate/llm.py`):
+
+- **アダプティブ思考**(`thinking: adaptive`)— モデルが必要に応じて推論を深め、比較や選び方の質が上がる
+- **エフォート制御**(`EFFORT`、既定 `high`)— 品質とコスト/速度のトレードオフを1変数で調整。記事は `high`、テーマ選定は `medium`
+- **構造化出力**(JSON Schema)— 返答が必ず有効なJSONになり、パース失敗で記事が落ちる事故をなくす
+- **ストリーミング**— 長文記事生成でのタイムアウトを回避
+- **プロンプトキャッシュ**— システムプロンプトにキャッシュ断点を設置(プレフィックスが十分長い場合に課金を節約)
+- **多重フォールバック**— もしSDK/モデルが新パラメータを拒否しても、自動で素朴な呼び出しに切り替えて止まらない
+
+> コスト感: 記事1本あたり数円〜十数円程度(`EFFORT` と文字数次第)。`ARTICLES_PER_RUN=2` なら1日数十円。`EFFORT=medium` でさらに下げられます。
 
 ---
 

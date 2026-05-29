@@ -57,7 +57,8 @@ jobs:
           GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
           BING_SITE_VERIFICATION: ${{ vars.BING_SITE_VERIFICATION }}
           ARTICLES_PER_RUN: ${{ github.event.inputs.articles || vars.ARTICLES_PER_RUN || '2' }}
-          MODEL: ${{ vars.MODEL || 'claude-opus-4-7' }}
+          MODEL: ${{ vars.MODEL || 'claude-opus-4-8' }}
+          EFFORT: ${{ vars.EFFORT || 'high' }}
           PYTHONPATH: src
         run: python -m affiliate.cli run
 

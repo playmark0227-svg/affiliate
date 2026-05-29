@@ -31,6 +31,7 @@ def save_post(article: dict[str, Any], body: str) -> Path:
         category=article.get("category", ""),
         slug=slug,
     )
-    with path.open("wb") as f:
-        frontmatter.dump(post, f)
+    # frontmatter.dumps() returns str across versions; write as UTF-8 text.
+    # (Newer python-frontmatter writes str and errors on a binary handle.)
+    path.write_text(frontmatter.dumps(post), encoding="utf-8")
     return path

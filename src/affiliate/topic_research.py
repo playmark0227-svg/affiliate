@@ -16,6 +16,7 @@ from typing import Any
 
 import anthropic
 
+from . import llm
 from .config import Config
 
 
@@ -57,6 +58,35 @@ USER_TEMPLATE = """\
 }}
 """
 
+# Structured-outputs schema for the topic list.
+TOPICS_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "topics": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "title": {"type": "string"},
+                    "category": {"type": "string"},
+                    "search_query": {"type": "string"},
+                    "primary_keyword": {"type": "string"},
+                    "secondary_keywords": {"type": "array", "items": {"type": "string"}},
+                    "intent": {"type": "string"},
+                    "rationale": {"type": "string"},
+                },
+                "required": [
+                    "title", "category", "search_query", "primary_keyword",
+                    "secondary_keywords", "intent", "rationale",
+                ],
+                "additionalProperties": False,
+            },
+        },
+    },
+    "required": ["topics"],
+    "additionalProperties": False,
+}
+
 
 def propose_topics(cfg: Config, state: dict[str, Any], n: int) -> list[dict[str, Any]]:
     client = anthropic.Anthropic(api_key=cfg.require_api_key())
@@ -71,25 +101,21 @@ def propose_topics(cfg: Config, state: dict[str, Any], n: int) -> list[dict[str,
         n=n,
     )
 
-    msg = client.messages.create(
-        model=cfg.model,
-        max_tokens=2048,
-        system=SYSTEM,
-        messages=[{"role": "user", "content": user}],
-    )
-
-    text = "".join(b.text for b in msg.content if b.type == "text").strip()
-    # Be tolerant: strip code fences if the model wrapped the JSON.
-    if text.startswith("```"):
-        text = text.split("```", 2)[1]
-        if text.lower().startswith("json"):
-            text = text[4:]
-        text = text.strip("` \n")
-
+    # Lighter task than article writing — medium effort, short non-streamed reply.
     try:
-        data = json.loads(text)
-        topics = data.get("topics", [])
-    except json.JSONDecodeError:
+        data = llm.generate_json(
+            client,
+            model=cfg.model,
+            system=SYSTEM,
+            user=user,
+            schema=TOPICS_SCHEMA,
+            effort="medium",
+            max_tokens=6000,
+            stream=False,
+        )
+        topics = data.get("topics", []) if isinstance(data, dict) else []
+    except (json.JSONDecodeError, anthropic.APIError) as e:
+        print(f"[topics] generation failed ({type(e).__name__}); using fallback")
         topics = []
 
     if not topics:

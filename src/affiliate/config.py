@@ -13,6 +13,14 @@ SITE_DIR = ROOT / "site"
 PROMPTS_DIR = ROOT / "prompts"
 TEMPLATES_DIR = ROOT / "templates"
 
+# Effort levels accepted by Opus 4.6+ (output_config.effort). "max" is Opus-tier.
+EFFORT_LEVELS = {"low", "medium", "high", "xhigh", "max"}
+
+
+def _normalize_effort(value: str) -> str:
+    v = (value or "").strip().lower()
+    return v if v in EFFORT_LEVELS else "high"
+
 
 @dataclass
 class Config:
@@ -41,6 +49,7 @@ class Config:
 
     articles_per_run: int
     model: str
+    effort: str
 
     @classmethod
     def from_env(cls) -> "Config":
@@ -64,7 +73,8 @@ class Config:
             bing_site_verification=os.environ.get("BING_SITE_VERIFICATION", "").strip(),
             discord_webhook_url=os.environ.get("DISCORD_WEBHOOK_URL", "").strip(),
             articles_per_run=int(os.environ.get("ARTICLES_PER_RUN", "2")),
-            model=os.environ.get("MODEL", "claude-opus-4-7"),
+            model=os.environ.get("MODEL", "claude-opus-4-8"),
+            effort=_normalize_effort(os.environ.get("EFFORT", "high")),
         )
 
     def require_api_key(self) -> str:

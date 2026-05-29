@@ -2,30 +2,80 @@
 from __future__ import annotations
 
 import datetime as dt
-import json
 from typing import Any
 
 import anthropic
 
+from . import llm
 from .affiliate_links import AffiliateContext
 from .config import Config
 
 
 SYSTEM = """\
 あなたは日本語の商品レビュー記事を書くプロのライター兼SEOエディターです。
-読者が「買って失敗したくない」と思って検索している前提で、
+読者が「買って失敗したくない」と思って検索している前提で書きます。
 
+# トーンと品質
 - E-E-A-T(経験/専門性/権威性/信頼性)を意識し、断定しすぎない誠実なトーン
-- 具体的な比較軸(価格帯、サイズ、用途、向いている人)
-- 各商品候補は一般名・カテゴリで紹介し、実在しないモデル名や型番は捏造しない
-- 価格や仕様は「目安」「2024年時点の参考」と明示する
-- 結論を冒頭に簡潔に出してから詳述
-- 重要箇所はh2/h3とリストで読みやすく
-- 法的に問題のある効能効果(医薬品的表現)を避ける
-- アフィリエイト広告である旨をフッターに明記
+- 具体的な比較軸(価格帯、サイズ、用途、向いている人)を必ず示す
+- 一般的なAI生成文にありがちな冗長な前置き・決まり文句を避け、要点から書く
+- 文章量はテーマの複雑さに見合わせる(過剰な水増しをしない)
 
-出力は厳密なJSONのみ。説明文は不要。
+# 事実の扱い(重要)
+- 各商品候補は一般名・カテゴリで紹介し、実在しないモデル名や型番は捏造しない
+- 価格や仕様は「目安」「執筆時点の参考」と明示し、確定的に断言しない
+- 不確実なことは「一般に」「製品により異なる」と幅を持たせる
+
+# 法令順守
+- 医薬品的な効能効果の表現(薬機法に抵触する表現)を使わない
+- 「最安」「No.1」「必ず効く」など根拠のない最上級・誇大表現(景表法)を避ける
+- アフィリエイト広告である旨はフッターで明記される前提で書く
+
+出力は指定スキーマに厳密に従うこと。
 """
+
+# Structured-outputs schema — guarantees the reply parses as valid JSON.
+ARTICLE_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "title": {"type": "string"},
+        "description": {"type": "string"},
+        "tags": {"type": "array", "items": {"type": "string"}},
+        "category": {"type": "string"},
+        "summary": {"type": "string"},
+        "products": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "search_query": {"type": "string"},
+                    "for_whom": {"type": "string"},
+                    "pros": {"type": "array", "items": {"type": "string"}},
+                    "cons": {"type": "array", "items": {"type": "string"}},
+                },
+                "required": ["name", "search_query", "for_whom", "pros", "cons"],
+                "additionalProperties": False,
+            },
+        },
+        "buying_guide": {"type": "array", "items": {"type": "string"}},
+        "faq": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {"q": {"type": "string"}, "a": {"type": "string"}},
+                "required": ["q", "a"],
+                "additionalProperties": False,
+            },
+        },
+        "closing": {"type": "string"},
+    },
+    "required": [
+        "title", "description", "tags", "category", "summary",
+        "products", "buying_guide", "faq", "closing",
+    ],
+    "additionalProperties": False,
+}
 
 USER_TEMPLATE = """\
 今日の日付: {today}
@@ -84,19 +134,17 @@ def generate_article(cfg: Config, topic: dict[str, Any]) -> dict[str, Any]:
         intent=topic.get("intent", ""),
     )
 
-    msg = client.messages.create(
+    # Long output + adaptive thinking → stream to avoid HTTP timeouts.
+    article = llm.generate_json(
+        client,
         model=cfg.model,
-        max_tokens=4096,
         system=SYSTEM,
-        messages=[{"role": "user", "content": user}],
+        user=user,
+        schema=ARTICLE_SCHEMA,
+        effort=cfg.effort,
+        max_tokens=16000,
+        stream=True,
     )
-    text = "".join(b.text for b in msg.content if b.type == "text").strip()
-    if text.startswith("```"):
-        text = text.split("```", 2)[1]
-        if text.lower().startswith("json"):
-            text = text[4:]
-        text = text.strip("` \n")
-    article = json.loads(text)
     article["topic"] = topic
     return article
 

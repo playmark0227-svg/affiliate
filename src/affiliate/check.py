@@ -112,7 +112,11 @@ def main() -> int:
 
     print("\n=== Tuning ===")
     _ok(f"ARTICLES_PER_RUN = {cfg.articles_per_run}")
-    _ok(f"MODEL = {cfg.model}")
+    if cfg.model == "claude-opus-4-8":
+        _ok(f"MODEL = {cfg.model} (latest)")
+    else:
+        _warn(f"MODEL = {cfg.model} (default is claude-opus-4-8)")
+    _ok(f"EFFORT = {cfg.effort} (adaptive thinking + effort enabled)")
 
     print()
     if fatal:
